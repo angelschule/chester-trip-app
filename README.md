@@ -49,7 +49,7 @@ Kostenlose "Spark"-Stufe, keine Kreditkarte nötig, einmalig einzurichten:
 6. **Deine eigene Geräte-ID finden**, um dich als Admin einzutragen: App öffnen (z. B.
    lokal, siehe unten, oder schon live auf GitHub Pages) → Tab **Mehr** öffnen → ganz
    unten steht "Geräte-ID: …". Dieser Wert steht bereits in `js/admin-config.js` bei
-   `ADMIN_UID` (`ZCdlly38pvSgaKwYUmi4COldlbZ2`) — nur dieses Gerät sieht danach die
+   `ADMIN_UID` (`ZCdlly38pvSgaKwYUmii4COldlbZ2`) — nur dieses Gerät sieht danach die
    Liste offener Zugangs-Anfragen und kann sie bestätigen/ablehnen. Falls du die App
    mal auf einem anderen Gerät als Admin nutzen willst, hier bzw. mit mir aktualisieren.
 7. Im Firestore-Reiter **Regeln** den folgenden Text einfügen (Admin-UID ist schon
@@ -61,7 +61,7 @@ Kostenlose "Spark"-Stufe, keine Kreditkarte nötig, einmalig einzurichten:
      match /databases/{database}/documents {
 
        function isAdmin() {
-         return request.auth != null && request.auth.uid == "ZCdlly38pvSgaKwYUmi4COldlbZ2";
+         return request.auth != null && request.auth.uid == "ZCdlly38pvSgaKwYUmii4COldlbZ2";
        }
 
        function isApproved() {
