@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Notfall – Chester App</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0071E3">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="page">
+
+  <div class="page-header">
+    <h1>Notfall</h1>
+    <a href="index.html" aria-label="Zur Startseite" class="icon-btn" style="background:var(--icon-tile-bg);color:var(--text-primary);">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"></path><path d="M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9"></path></svg>
+    </a>
+  </div>
+
+  <div class="page-content">
+
+    <a href="tel:999" style="background:var(--danger);color:#FFFFFF;border-radius:18px;padding:18px;display:flex;align-items:center;gap:14px;transition:background-color .15s ease;">
+      <div style="flex:none;width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,0.22);display:flex;align-items:center;justify-content:center;">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6.6 10.8c1.4 2.8 3.8 5.2 6.6 6.6l2.2-2.2c.3-.3.7-.4 1.1-.3 1.2.4 2.5.6 3.8.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.6.6 3.8.1.4 0 .8-.3 1.1L6.6 10.8Z"></path></svg>
+      </div>
+      <div>
+        <div style="font-weight:700;font-size:19px;letter-spacing:-0.01em;">999 anrufen</div>
+        <div style="font-size:12.5px;opacity:0.92;margin-top:2px;">Polizei · Feuerwehr · Rettungsdienst (UK-Notruf)</div>
+      </div>
+    </a>
+
+    <div>
+      <div class="section-label">Meine Kontakte</div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+
+        <div class="card" style="display:flex;align-items:center;gap:12px;">
+          <div style="flex:1 1 auto;">
+            <div style="font-weight:600;font-size:14px;margin-bottom:6px;">Gastfamilie – Michelle O'Brien</div>
+            <label for="gastPhone" style="margin-bottom:2px;">Telefonnummer</label>
+            <input type="tel" id="gastPhone" placeholder="+44 …" oninput="updateNotfallLinks()">
+          </div>
+          <a id="gast-call-link" href="#" aria-label="Gastfamilie anrufen" class="icon-btn" style="background:var(--accent-blue);display:none;">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6.6 10.8c1.4 2.8 3.8 5.2 6.6 6.6l2.2-2.2c.3-.3.7-.4 1.1-.3 1.2.4 2.5.6 3.8.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.6.6 3.8.1.4 0 .8-.3 1.1L6.6 10.8Z"></path></svg>
+          </a>
+        </div>
+
+        <div class="card">
+          <div style="font-weight:600;font-size:14px;">Schulbüro – ELC Chester</div>
+          <div class="secondary" style="font-size:12px;margin:4px 0 10px 0;">+44 1244 318913</div>
+          <a href="tel:+441244318913" class="primary-btn" style="padding:10px;font-size:13px;">Anrufen</a>
+        </div>
+
+        <div class="card" style="display:flex;align-items:center;gap:12px;">
+          <div style="flex:1 1 auto;">
+            <label for="betreuungName" style="margin-bottom:2px;">Reiseleitung / Betreuung – Name</label>
+            <input type="text" id="betreuungName" placeholder="Name eintragen" style="margin-bottom:10px;">
+            <label for="betreuungPhone" style="margin-bottom:2px;">Telefonnummer</label>
+            <input type="tel" id="betreuungPhone" placeholder="+44 …" oninput="updateNotfallLinks()">
+          </div>
+          <a id="betreuung-call-link" href="#" aria-label="Betreuung anrufen" class="icon-btn" style="background:var(--accent-blue);display:none;">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6.6 10.8c1.4 2.8 3.8 5.2 6.6 6.6l2.2-2.2c.3-.3.7-.4 1.1-.3 1.2.4 2.5.6 3.8.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.6.6 3.8.1.4 0 .8-.3 1.1L6.6 10.8Z"></path></svg>
+          </a>
+        </div>
+
+      </div>
+    </div>
+
+    <div>
+      <div class="section-label">Meine Adressen</div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+
+        <div class="card" style="display:flex;align-items:center;gap:12px;">
+          <div style="flex:1 1 auto;">
+            <div style="font-weight:600;font-size:13.5px;">Gastfamilie</div>
+            <div class="secondary" style="font-size:12.5px;margin-top:2px;">Michelle O'Brien, 23 Warwick Road, Blacon, Chester CH1 5BY</div>
+          </div>
+          <button onclick="copyToClipboard('Michelle O\'Brien, 23 Warwick Road, Blacon, Chester CH1 5BY')" aria-label="Gastadresse kopieren" class="icon-btn" style="background:var(--icon-tile-bg);">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-primary)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="1.5"></rect><path d="M5 15V5a1 1 0 0 1 1-1h10"></path></svg>
+          </button>
+        </div>
+
+        <div class="card" style="display:flex;align-items:center;gap:12px;">
+          <div style="flex:1 1 auto;">
+            <div style="font-weight:600;font-size:13.5px;">Schule</div>
+            <div class="secondary" style="font-size:12.5px;margin-top:2px;">ELC Chester, 9-11 Stanley Place, Chester CH1 2LU</div>
+          </div>
+          <button onclick="copyToClipboard('ELC Chester, 9-11 Stanley Place, Chester CH1 2LU')" aria-label="Schuladresse kopieren" class="icon-btn" style="background:var(--icon-tile-bg);">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-primary)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="1.5"></rect><path d="M5 15V5a1 1 0 0 1 1-1h10"></path></svg>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="font-weight:600;font-size:13.5px;margin-bottom:10px;">Auslandskrankenversicherung</div>
+      <label for="versicherungName" style="margin-bottom:2px;">Versicherung</label>
+      <input type="text" id="versicherungName" placeholder="Name eintragen" style="margin-bottom:10px;">
+      <label for="versicherungNummer" style="margin-bottom:2px;">Policennummer</label>
+      <input type="text" id="versicherungNummer" placeholder="Nummer eintragen">
+      <div class="secondary" style="font-size:11px;margin-top:8px;">Wird nur lokal auf diesem Gerät gespeichert, nirgendwo hochgeladen.</div>
+    </div>
+
+  </div>
+
+  <div class="bottom-nav">
+    <a href="index.html" class="nav-item">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"></path><path d="M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9"></path></svg>
+      Home
+    </a>
+    <a href="unterwegs.html" class="nav-item">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="12" rx="2"></rect><path d="M4 12h16"></path><circle cx="8" cy="19" r="1.5"></circle><circle cx="16" cy="19" r="1.5"></circle></svg>
+      Unterwegs
+    </a>
+    <a href="naehe.html" class="nav-item">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12Z"></path><circle cx="12" cy="9" r="2.5"></circle></svg>
+      Nähe
+    </a>
+    <a href="gruppe.html" class="nav-item">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"></circle><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"></path><circle cx="17" cy="9" r="2.4"></circle><path d="M15.5 14.2c2.6.4 4.5 2.6 4.5 5.3"></path></svg>
+      Gruppe
+    </a>
+    <a href="mehr.html" class="nav-item">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="6" height="6" rx="1"></rect><rect x="14" y="4" width="6" height="6" rx="1"></rect><rect x="4" y="14" width="6" height="6" rx="1"></rect><rect x="14" y="14" width="6" height="6" rx="1"></rect></svg>
+      Mehr
+    </a>
+  </div>
+
+</div>
+
+<script src="js/notfall.js"></script>
+<script>initNotfallForm();</script>
+</body>
+</html>

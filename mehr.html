@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mehr – Chester App</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0071E3">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="page">
+
+  <div class="page-header">
+    <h1>Mehr</h1>
+    <a href="notfall.html" aria-label="Notfall öffnen" class="icon-btn sos-btn">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 20h20L12 3Z"></path><path d="M12 10v4"></path><circle cx="12" cy="17" r="0.9" fill="currentColor" stroke="none"></circle></svg>
+    </a>
+  </div>
+
+  <div class="page-content">
+
+    <div class="card-lg">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+        <div class="badge" style="background:var(--icon-tile-bg);">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-nav-inactive)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="15" rx="2"></rect><path d="M4 9h16M8 3v4M16 3v4"></path></svg>
+        </div>
+        <div style="font-weight:700;font-size:16.5px;letter-spacing:-0.01em;">Stundenplan</div>
+      </div>
+      <div class="empty-state" style="padding-left:40px;">Noch nicht hinterlegt – trag deinen Stundenplan in <code>mehr.html</code> ein, sobald du ihn hast.</div>
+    </div>
+
+    <div class="card-lg">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+        <div class="badge" style="background:var(--icon-tile-bg);">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-nav-inactive)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.5 5.5L20 9l-4 4 1 6-5-3-5 3 1-6-4-4 5.5-.5L12 3Z"></path></svg>
+        </div>
+        <div style="font-weight:700;font-size:16.5px;letter-spacing:-0.01em;">Sozialprogramm</div>
+      </div>
+      <div class="empty-state" style="padding-left:40px;">Noch nicht hinterlegt – trag das Programm ein, sobald du es hast.</div>
+    </div>
+
+    <div class="card-lg">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+        <div class="badge" style="background:var(--icon-tile-accent-bg);">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent-blue)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h9M7 7l3-3M7 7l3 3M17 17H8M17 17l-3-3M17 17l-3 3"></path></svg>
+        </div>
+        <div style="font-weight:700;font-size:16.5px;letter-spacing:-0.01em;">Währungsrechner</div>
+      </div>
+      <label for="gbpInput">Betrag in GBP (£)</label>
+      <input id="gbpInput" type="number" inputmode="decimal" value="20" oninput="updateConversion()" style="margin-bottom:12px;">
+      <div style="display:flex;gap:10px;">
+        <div style="flex:1;background:var(--input-bg);border-radius:11px;padding:10px 12px;">
+          <div style="font-size:11px;color:var(--text-secondary);">≈ Euro</div>
+          <div style="font-weight:700;font-size:16px;"><span id="eur-out">23.20</span> €</div>
+        </div>
+        <div style="flex:1;background:var(--input-bg);border-radius:11px;padding:10px 12px;">
+          <div style="font-size:11px;color:var(--text-secondary);">≈ Franken</div>
+          <div style="font-weight:700;font-size:16px;"><span id="chf-out">21.80</span> CHF</div>
+        </div>
+      </div>
+      <div id="rate-note" class="secondary" style="font-size:11px;margin-top:8px;font-style:italic;">Kurs wird geladen …</div>
+    </div>
+
+    <div class="card-lg">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+        <div class="badge" style="background:var(--icon-tile-accent-bg);">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent-blue)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="8" width="16" height="11" rx="2"></rect><path d="M9 8V6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"></path><path d="M4 13h16"></path></svg>
+        </div>
+        <div style="font-weight:700;font-size:16.5px;letter-spacing:-0.01em;">Rückreise-Checkliste</div>
+      </div>
+      <div id="checklist" style="display:flex;flex-direction:column;gap:11px;"></div>
+    </div>
+
+  </div>
+
+  <div class="bottom-nav">
+    <a href="index.html" class="nav-item">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"></path><path d="M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9"></path></svg>
+      Home
+    </a>
+    <a href="unterwegs.html" class="nav-item">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="12" rx="2"></rect><path d="M4 12h16"></path><circle cx="8" cy="19" r="1.5"></circle><circle cx="16" cy="19" r="1.5"></circle></svg>
+      Unterwegs
+    </a>
+    <a href="naehe.html" class="nav-item">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12Z"></path><circle cx="12" cy="9" r="2.5"></circle></svg>
+      Nähe
+    </a>
+    <a href="gruppe.html" class="nav-item">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"></circle><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"></path><circle cx="17" cy="9" r="2.4"></circle><path d="M15.5 14.2c2.6.4 4.5 2.6 4.5 5.3"></path></svg>
+      Gruppe
+    </a>
+    <a href="mehr.html" class="nav-item active">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="6" height="6" rx="1"></rect><rect x="14" y="4" width="6" height="6" rx="1"></rect><rect x="4" y="14" width="6" height="6" rx="1"></rect><rect x="14" y="14" width="6" height="6" rx="1"></rect></svg>
+      Mehr
+    </a>
+  </div>
+
+</div>
+
+<script src="js/currency.js"></script>
+<script src="js/checklist.js"></script>
+<script>
+  loadRates();
+  renderChecklist();
+</script>
+</body>
+</html>

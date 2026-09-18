@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Unterwegs – Chester App</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0071E3">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="page">
+
+  <div class="page-header">
+    <h1>Unterwegs</h1>
+    <a href="notfall.html" aria-label="Notfall öffnen" class="icon-btn sos-btn">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 20h20L12 3Z"></path><path d="M12 10v4"></path><circle cx="12" cy="17" r="0.9" fill="currentColor" stroke="none"></circle></svg>
+    </a>
+  </div>
+
+  <div class="page-content">
+
+    <div class="segmented">
+      <button id="seg-schule" class="seg-btn active" onclick="selectDestination('schule')">Zur Schule</button>
+      <button id="seg-gast" class="seg-btn" onclick="selectDestination('gast')">Zur Gastfamilie</button>
+    </div>
+
+    <div class="card-lg" style="display:flex;flex-direction:column;gap:4px;">
+      <div style="display:flex;align-items:center;gap:8px;color:var(--text-secondary);font-size:12.5px;font-weight:600;text-transform:uppercase;letter-spacing:0.03em;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="m15 9-1.5 4.5L9 15l1.5-4.5L15 9Z"></path></svg>
+        Nächste Haltestelle
+      </div>
+      <div id="stop-name" style="font-weight:700;font-size:19px;letter-spacing:-0.01em;margin-top:2px;"></div>
+      <div id="walk-to-stop" class="secondary" style="font-size:13px;"></div>
+    </div>
+
+    <div>
+      <div class="section-label">Nächste Abfahrten</div>
+      <div id="departures-list" style="display:flex;flex-direction:column;gap:10px;"></div>
+    </div>
+
+    <a id="map-link" href="#" class="primary-btn">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l17-8-8 17-2-7-7-2Z"></path></svg>
+      Route in Karten öffnen
+    </a>
+    <div id="map-address" class="secondary" style="text-align:center;font-size:12px;margin-top:-10px;"></div>
+    <div class="secondary" style="text-align:center;font-size:12px;">Fahrzeiten sind der reguläre Fahrplan, keine Live-Position des Busses.</div>
+
+  </div>
+
+  <div class="bottom-nav">
+    <a href="index.html" class="nav-item">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"></path><path d="M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9"></path></svg>
+      Home
+    </a>
+    <a href="unterwegs.html" class="nav-item active">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="12" rx="2"></rect><path d="M4 12h16"></path><circle cx="8" cy="19" r="1.5"></circle><circle cx="16" cy="19" r="1.5"></circle></svg>
+      Unterwegs
+    </a>
+    <a href="naehe.html" class="nav-item">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12Z"></path><circle cx="12" cy="9" r="2.5"></circle></svg>
+      Nähe
+    </a>
+    <a href="gruppe.html" class="nav-item">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"></circle><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"></path><circle cx="17" cy="9" r="2.4"></circle><path d="M15.5 14.2c2.6.4 4.5 2.6 4.5 5.3"></path></svg>
+      Gruppe
+    </a>
+    <a href="mehr.html" class="nav-item">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="6" height="6" rx="1"></rect><rect x="14" y="4" width="6" height="6" rx="1"></rect><rect x="4" y="14" width="6" height="6" rx="1"></rect><rect x="14" y="14" width="6" height="6" rx="1"></rect></svg>
+      Mehr
+    </a>
+  </div>
+
+</div>
+
+<script src="js/geo.js"></script>
+<script src="js/bus.js"></script>
+<script>renderBusScreen();</script>
+</body>
+</html>
