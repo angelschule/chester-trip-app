@@ -9,6 +9,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0071E3">
 <link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">
 </head>
 <body>
 <div class="page">
@@ -21,6 +22,25 @@
   </div>
 
   <div class="page-content">
+
+    <div>
+      <div class="card-lg" style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
+        <div>
+          <div style="font-weight:600;font-size:14.5px;">Meinen Standort teilen</div>
+          <div class="secondary" style="font-size:12px;margin-top:2px;">Nur solange die App bei dir offen ist. Jederzeit ausschaltbar.</div>
+        </div>
+        <button id="location-toggle" class="toggle-switch" role="switch" aria-checked="false" aria-label="Standort mit der Gruppe teilen"></button>
+      </div>
+      <div id="location-status" class="secondary" style="font-size:11px;margin-top:6px;">Wird geladen …</div>
+    </div>
+
+    <div id="live-map" style="height:220px;border-radius:16px;overflow:hidden;box-shadow:var(--shadow-card-sm);"></div>
+
+    <div>
+      <div class="section-label">Live-Standorte der Gruppe</div>
+      <div id="live-locations-list" style="display:flex;flex-direction:column;gap:10px;"></div>
+    </div>
+
     <div>
       <div class="section-label">Wohnen in deiner Nähe</div>
       <div id="group-list" style="display:flex;flex-direction:column;gap:10px;"></div>
@@ -52,8 +72,18 @@
 
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="js/firebase-config.js"></script>
+<script src="js/contacts.js"></script>
 <script src="js/geo.js"></script>
 <script src="js/group.js"></script>
-<script>loadGroupDistances("group-list");</script>
+<script src="js/livemap.js"></script>
+<script>
+  loadGroupDistances("group-list");
+  initLiveMap();
+</script>
 </body>
 </html>

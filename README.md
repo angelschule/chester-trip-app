@@ -10,12 +10,13 @@ Läuft komplett im Browser, kein Server, keine Kosten.
 | Wetter (Home) | **Live** – Open-Meteo, basierend auf deinem aktuellen Standort |
 | Wetter-Detailseite | **Live** – Stundenverlauf für heute (Temperatur, Regenwahrscheinlichkeit) plus Regenschirm-Hinweis, erreichbar per Tap auf die Wetterkarte auf Home |
 | In der Nähe | **Live** – OpenStreetMap, sortiert nach deiner echten Entfernung |
-| Gruppe | **Live-Distanz**, aber feste Adressen (unten eintragbar) |
+| Gruppe | **Live-Distanz** zu festen Adressen, plus **Live-Standortkarte** der Gruppe (opt-in, siehe unten) |
 | Unterwegs / Busse | **Echte Chester-Haltestellen & echter Fahrplan** (UK Bus Open Data Service), findet die nächste Haltestelle zu deinem Live-Standort und zeigt nur direkte Busse (ohne Umsteigen) zur Schule bzw. Gastfamilie. **Keine Live-GPS-Position** des Busses selbst (siehe unten) |
 | Stundenplan / Sozialprogramm | Platzhalter, noch einzutragen |
 | Währungsrechner | **Live** – Frankfurter.app (Wechselkurs der EZB) |
 | Checkliste, Versicherungsdaten | Werden lokal auf deinem Gerät gespeichert (`localStorage`), nirgendwo hochgeladen |
 | Notfall-Kontakte (Name, Gastfamilie, Betreuung) | **Live, geteilt** – zentral in Firebase gespeichert, jede Person sieht die Einträge der ganzen Gruppe (siehe Abschnitt "Firebase einrichten" unten) |
+| Live-Standortkarte (Gruppe) | **Live, opt-in** – nur Personen, die den Schalter aktiv eingeschaltet haben, sind sichtbar; Standort wird alle ~45s aktualisiert, nur solange die App offen ist, und beim Ausschalten sofort gelöscht (Leaflet + OpenStreetMap-Kacheln, kostenlos, kein Google-Maps-Konto) |
 
 ### Wie die Busdaten funktionieren
 
@@ -29,10 +30,11 @@ Service für Nordwest-England erzeugt – Snapshot vom 18.09.2026. Das bedeutet:
 - **Einschränkung:** der Fahrplan-Snapshot berücksichtigt reguläre Wochentags-/Wochenend-Muster, aber keine kurzfristigen Ausnahmen (Feiertage, Umleitungen). Für ganz aktuelle Änderungen im Zweifel bei [Traveline](https://www.traveline.info) nachschauen.
 - Falls sich der Fahrplan über die Zeit ändert, können die beiden JSON-Dateien bei Bedarf neu erzeugt werden (sag mir Bescheid, dann mache ich das).
 
-## Firebase einrichten (für geteilte Notfallkontakte)
+## Firebase einrichten (für geteilte Notfallkontakte & Live-Standort)
 
-Damit die ganze Gruppe die Kontakte/Adressen sehen kann, braucht `notfall.html` ein
-Firebase-Projekt. Kostenlose "Spark"-Stufe, keine Kreditkarte nötig, einmalig einzurichten:
+Damit die ganze Gruppe die Kontakte/Adressen sehen kann (`notfall.html`) und die
+Live-Standortkarte funktioniert (`gruppe.html`), braucht die App ein Firebase-Projekt.
+Kostenlose "Spark"-Stufe, keine Kreditkarte nötig, einmalig einzurichten:
 
 1. [console.firebase.google.com](https://console.firebase.google.com) → **Projekt hinzufügen** → Namen vergeben (z. B. `chester-trip-app`).
 2. **Projekteinstellungen** (Zahnrad oben links) → Reiter **Allgemein** → ganz unten bei
@@ -53,12 +55,16 @@ Firebase-Projekt. Kostenlose "Spark"-Stufe, keine Kreditkarte nötig, einmalig e
          allow read: if request.auth != null;
          allow write: if request.auth != null && request.auth.uid == userId;
        }
+       match /locations/{userId} {
+         allow read: if request.auth != null;
+         allow write: if request.auth != null && request.auth.uid == userId;
+       }
      }
    }
    ```
 
-   Das bedeutet: jede angemeldete (anonyme) Person kann alle Kontakte lesen, aber nur
-   ihren eigenen Eintrag schreiben.
+   Das bedeutet: jede angemeldete (anonyme) Person kann alle Kontakte und Standorte
+   lesen, aber nur ihren eigenen Eintrag schreiben oder löschen.
 6. Die 6 Werte aus Schritt 2 in `js/firebase-config.js` eintragen, committen & pushen.
 
 Diese Werte sind nicht geheim – sie identifizieren nur das Projekt. Der eigentliche
@@ -83,7 +89,7 @@ Wichtig: Safari muss verwendet werden (nicht Chrome/Firefox auf iOS) und die Sei
 ## 3. Grenzen, die du kennen solltest
 
 - **Kein echtes Live-GPS-Tracking der Busse.** Der UK Bus Open Data Service bietet das zwar kostenlos an, aber nur über einen Server-Proxy (Browser kann die Rohdaten aus CORS-Gründen nicht direkt lesen). Das wäre eine mögliche Erweiterung über z. B. Cloudflare Pages Functions (ebenfalls kostenlos) – sag Bescheid, falls gewünscht.
-- **Standort nur bei geöffneter App.** Als reine Web-App gibt es kein Hintergrund-Tracking; die Seite muss offen sein, um deinen Standort zu aktualisieren.
+- **Standort nur bei geöffneter App.** Als reine Web-App gibt es kein Hintergrund-Tracking; die Seite muss offen sein, um deinen Standort zu aktualisieren. Die Live-Standortkarte in `gruppe.html` blendet Positionen aus, die seit mehr als 15 Minuten nicht aktualisiert wurden, damit niemand einen veralteten Standort für live hält.
 - **OpenStreetMap-Daten** sind community-gepflegt und nicht überall so vollständig wie Google Maps – meistens aber gut genug für Restaurants/Läden in Wohngebieten.
 
 ## 4. Lokal testen (optional)

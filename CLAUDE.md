@@ -25,7 +25,10 @@ Bereits verwendet, alles kostenlos & ohne Account-Zwang:
   zeigt nur direkte (umsteigefreie) Busse zur Schule oder Gastfamilie
 - `naehe.html` + `js/places.js` — Restaurants/Läden live sortiert nach Standort
 - `gruppe.html` + `js/group.js` — Distanz vom Live-Standort zu fest hinterlegten
-  Mitschüler-Adressen (aktuell hartcodiert in group.js)
+  Mitschüler-Adressen (aktuell hartcodiert in group.js), PLUS `js/livemap.js`:
+  Live-Standortkarte der Gruppe (Leaflet + OSM), rein opt-in über einen Ein/Aus-Schalter,
+  aktualisiert nur solange die App offen ist, Positionen älter als 15 Min werden
+  ausgeblendet, beim Ausschalten wird der Firestore-Eintrag sofort gelöscht
 - `mehr.html` — Währungsrechner (live), Rückreise-Checkliste (localStorage), Platzhalter
   für Stundenplan/Sozialprogramm
 - `notfall.html` + `js/contacts.js` — 999-Anruf-Button, Kontakte, Adressen. Name,
@@ -44,23 +47,17 @@ Firebase (kostenlose "Spark"-Stufe, keine Kreditkarte nötig) ist seit Feature 1
 Einsatz — Setup siehe README.md, Config in `js/firebase-config.js`.
 
 **Erledigt:** Feature 1 (selbst eintragbare Kontakte/Adressen) — siehe `notfall.html` +
-`js/contacts.js`. Offen: `js/firebase-config.js` muss noch mit echten Projekt-Werten
-befüllt werden (Angel legt das Firebase-Projekt selbst an, siehe README.md).
+`js/contacts.js`. Feature 2 (Live-Standort-Übersicht) — siehe `gruppe.html` +
+`js/livemap.js`, Ein/Aus-Schalter standardmässig aus, jederzeit widerrufbar (löscht den
+Firestore-Eintrag sofort), Positionen älter als 15 Min werden ausgeblendet.
+
+Offen: die Firestore-Sicherheitsregeln in der Konsole müssen noch um die
+`locations`-Collection erweitert werden (Angel macht das selbst, Regeltext steht in
+README.md unter "Firebase einrichten").
 
 Noch offen:
 
-1. **Live-Standort-Übersicht ("Snap Map"-Stil)**: eine Karte, auf der man sieht, wer
-   von der Gruppe gerade wo ist — nur wenn diese Person das aktiv erlaubt hat.
-   Wichtige Einschränkung, die Angel schon kennt: Standort aktualisiert sich nur,
-   solange die App bei der jeweiligen Person offen ist (kein Hintergrund-Tracking,
-   das geht bei einer Web-App ohne Weiteres technisch nicht). Braucht:
-   - Firebase für die aktuellen Positionen
-   - Leaflet + OpenStreetMap-Kacheln für die Kartenansicht (kostenlos, kein
-     Google-Maps-Konto nötig)
-   - einen klaren, jederzeit widerrufbaren Ein/Aus-Schalter pro Person — das ist
-     nicht optional, sondern Voraussetzung, bevor das Feature live geht
-
-2. **Profilbilder**: einfachste kostenlose Umsetzung — Bild im Browser vor dem
+1. **Profilbilder**: einfachste kostenlose Umsetzung — Bild im Browser vor dem
    Hochladen auf z. B. 200×200px verkleinern (Canvas API) und zusammen mit den
    restlichen Daten in Firebase speichern. Kein separater Speicherdienst nötig.
 
