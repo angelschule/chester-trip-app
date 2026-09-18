@@ -27,8 +27,9 @@ Bereits verwendet, alles kostenlos & ohne Account-Zwang:
 - `gruppe.html` + `js/group.js` — Distanz vom Live-Standort zu fest hinterlegten
   Mitschüler-Adressen (aktuell hartcodiert in group.js), PLUS `js/livemap.js`:
   Live-Standortkarte der Gruppe (Leaflet + OSM), rein opt-in über einen Ein/Aus-Schalter,
-  aktualisiert nur solange die App offen ist, Positionen älter als 15 Min werden
-  ausgeblendet, beim Ausschalten wird der Firestore-Eintrag sofort gelöscht
+  aktualisiert nur solange die App offen ist. Zeigt den letzten bekannten Standort mit
+  Zeitangabe (z. B. "vor 12 Min") statt ihn zu verstecken, Marker werden grau statt lila
+  sobald über 2 Min alt. Beim Ausschalten wird der Firestore-Eintrag sofort gelöscht
 - `mehr.html` — Währungsrechner (live), Rückreise-Checkliste (localStorage), Platzhalter
   für Stundenplan/Sozialprogramm
 - `notfall.html` + `js/contacts.js` — 999-Anruf-Button, Kontakte, Adressen. Name,
@@ -49,7 +50,8 @@ Einsatz — Setup siehe README.md, Config in `js/firebase-config.js`.
 **Erledigt:** Feature 1 (selbst eintragbare Kontakte/Adressen) — siehe `notfall.html` +
 `js/contacts.js`. Feature 2 (Live-Standort-Übersicht) — siehe `gruppe.html` +
 `js/livemap.js`, Ein/Aus-Schalter standardmässig aus, jederzeit widerrufbar (löscht den
-Firestore-Eintrag sofort), Positionen älter als 15 Min werden ausgeblendet.
+Firestore-Eintrag sofort), letzter bekannter Standort bleibt mit Zeitangabe sichtbar
+statt zu verschwinden (grau statt lila sobald über 2 Min alt).
 
 Offen: die Firestore-Sicherheitsregeln in der Konsole müssen noch um die
 `locations`-Collection erweitert werden (Angel macht das selbst, Regeltext steht in

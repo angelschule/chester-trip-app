@@ -16,7 +16,7 @@ Läuft komplett im Browser, kein Server, keine Kosten.
 | Währungsrechner | **Live** – Frankfurter.app (Wechselkurs der EZB) |
 | Checkliste, Versicherungsdaten | Werden lokal auf deinem Gerät gespeichert (`localStorage`), nirgendwo hochgeladen |
 | Notfall-Kontakte (Name, Gastfamilie, Betreuung) | **Live, geteilt** – zentral in Firebase gespeichert, jede Person sieht die Einträge der ganzen Gruppe (siehe Abschnitt "Firebase einrichten" unten) |
-| Live-Standortkarte (Gruppe) | **Live, opt-in** – nur Personen, die den Schalter aktiv eingeschaltet haben, sind sichtbar; Standort wird alle ~45s aktualisiert, nur solange die App offen ist, und beim Ausschalten sofort gelöscht (Leaflet + OpenStreetMap-Kacheln, kostenlos, kein Google-Maps-Konto) |
+| Live-Standortkarte (Gruppe) | **Live, opt-in** – nur Personen, die den Schalter aktiv eingeschaltet haben, sind sichtbar; Standort wird alle ~45s aktualisiert, nur solange die App offen ist. Zeigt den letzten bekannten Standort mit Zeitangabe (z. B. "vor 12 Min"), Marker werden grau statt lila sobald sie seit über 2 Min nicht mehr aktualisiert wurden. Beim Ausschalten wird der Eintrag sofort gelöscht (Leaflet + OpenStreetMap-Kacheln, kostenlos, kein Google-Maps-Konto) |
 
 ### Wie die Busdaten funktionieren
 
@@ -89,7 +89,7 @@ Wichtig: Safari muss verwendet werden (nicht Chrome/Firefox auf iOS) und die Sei
 ## 3. Grenzen, die du kennen solltest
 
 - **Kein echtes Live-GPS-Tracking der Busse.** Der UK Bus Open Data Service bietet das zwar kostenlos an, aber nur über einen Server-Proxy (Browser kann die Rohdaten aus CORS-Gründen nicht direkt lesen). Das wäre eine mögliche Erweiterung über z. B. Cloudflare Pages Functions (ebenfalls kostenlos) – sag Bescheid, falls gewünscht.
-- **Standort nur bei geöffneter App.** Als reine Web-App gibt es kein Hintergrund-Tracking; die Seite muss offen sein, um deinen Standort zu aktualisieren. Die Live-Standortkarte in `gruppe.html` blendet Positionen aus, die seit mehr als 15 Minuten nicht aktualisiert wurden, damit niemand einen veralteten Standort für live hält.
+- **Standort nur bei geöffneter App.** Als reine Web-App gibt es kein Hintergrund-Tracking; die Seite muss offen sein, um deinen Standort zu aktualisieren. Die Live-Standortkarte in `gruppe.html` zeigt trotzdem den letzten bekannten Standort mit Zeitangabe an (statt ihn zu verstecken), markiert ihn aber grau statt lila, sobald er seit über 2 Minuten nicht mehr aktualisiert wurde, damit klar bleibt, was live ist und was nicht.
 - **OpenStreetMap-Daten** sind community-gepflegt und nicht überall so vollständig wie Google Maps – meistens aber gut genug für Restaurants/Läden in Wohngebieten.
 
 ## 4. Lokal testen (optional)
