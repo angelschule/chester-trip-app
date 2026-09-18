@@ -76,8 +76,10 @@ Offen:
 - Die Firestore-Sicherheitsregeln in der Konsole müssen noch mit dem AKTUELLEN
   Regeltext aus README.md ersetzt werden (enthält jetzt auch die Zugangs-Freigabe-Logik
   für Feature 4 — der alte Regeltext ohne isAdmin()/isApproved() reicht nicht mehr aus).
-- `js/admin-config.js` braucht noch Angels echte ADMIN_UID (siehe README.md,
-  "Deine eigene Geräte-ID finden").
+  `js/admin-config.js` hat bereits Angels echte ADMIN_UID (ZCdlly38pvSgaKwYUmi4COldlbZ2),
+  auch schon im README-Regeltext eingesetzt — nur noch in der Konsole einfügen.
+- Ein Test-Kontakt "Test Schueler" von Claudes eigenem Testen ist noch in der
+  `contacts`-Collection und sollte von Angel gelöscht werden.
 - **Mitschüler-Adressliste (`js/group.js`):** Angel hat eine echte Namensliste mit
   Gastfamilien-Adressen alle 24 Personen geliefert (Vor-/Nachname, Host, Adresse,
   Postleitzahl — inkl. 2 erwachsener Betreuungspersonen). Alle Adressen wurden bereits

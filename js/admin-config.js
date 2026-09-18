@@ -4,4 +4,4 @@
 // Diese ID ist nicht geheim (kein Passwort, nur ein zufälliger Anmelde-Bezeichner),
 // der eigentliche Schutz läuft über die Firestore-Sicherheitsregeln, nicht über
 // Geheimhaltung dieses Werts.
-const ADMIN_UID = "HIER-EINTRAGEN";
+const ADMIN_UID = "ZCdlly38pvSgaKwYUmi4COldlbZ2";
