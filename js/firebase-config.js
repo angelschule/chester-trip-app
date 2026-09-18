@@ -14,10 +14,10 @@
 // Diese Werte hier sind NICHT geheim (sie identifizieren nur das Projekt, keine
 // Zugangsdaten) – der eigentliche Schutz läuft über die Firestore-Sicherheitsregeln.
 const firebaseConfig = {
-  apiKey: "HIER-EINTRAGEN",
-  authDomain: "HIER-EINTRAGEN.firebaseapp.com",
-  projectId: "HIER-EINTRAGEN",
-  storageBucket: "HIER-EINTRAGEN.appspot.com",
-  messagingSenderId: "HIER-EINTRAGEN",
-  appId: "HIER-EINTRAGEN"
+  apiKey: "AIzaSyAqgB4T_yJh3PW-v1fBRd0fEeIr75uQ0G8",
+  authDomain: "chester-trip-app.firebaseapp.com",
+  projectId: "chester-trip-app",
+  storageBucket: "chester-trip-app.firebasestorage.app",
+  messagingSenderId: "235406995126",
+  appId: "1:235406995126:web:b9cf1acd7985ac57798017"
 };
