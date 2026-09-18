@@ -94,6 +94,8 @@ function wireUpLiveMap() {
 
   subscribeToGroupLocations();
 
+  if (typeof loadGroupDistances === "function") loadGroupDistances("group-list");
+
   setInterval(() => {
     if (lastLocationEntries.length === 0) return;
     renderLiveMarkers(lastLocationEntries);

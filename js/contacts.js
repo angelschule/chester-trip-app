@@ -96,7 +96,11 @@ async function initContactsForm() {
   CONTACT_FIELDS.forEach((field) => {
     const el = document.getElementById(field);
     if (!el) return;
-    el.addEventListener("change", () => saveContactField(docRef, field, el.value));
+    if (field === "name") {
+      el.addEventListener("change", () => handleNameChange(db, docRef, el.value));
+    } else {
+      el.addEventListener("change", () => saveContactField(docRef, field, el.value));
+    }
   });
   initPhotoUpload(docRef);
 
@@ -143,6 +147,49 @@ async function saveContactField(docRef, field, value) {
   } catch (e) {
     setContactsStatus("Konnte nicht speichern — Internetverbindung prüfen.");
   }
+}
+
+function normalizeName(name) {
+  return (name || "").trim().toLowerCase().replace(/\s+/g, " ");
+}
+
+// Gleicht den eingetragenen Namen mit der vorbefüllten Liste (Firestore-Collection
+// "roster", aus der Excel-Liste der Schule) ab und füllt die Gastfamilie automatisch
+// aus — aber nur leere Felder, damit eigene Korrekturen nie überschrieben werden.
+async function handleNameChange(db, docRef, name) {
+  await saveContactField(docRef, "name", name);
+
+  const key = normalizeName(name);
+  if (!key) return;
+  let entry;
+  try {
+    const snap = await db.collection("roster").doc(key).get();
+    if (!snap.exists) return;
+    entry = snap.data();
+  } catch (e) {
+    return;
+  }
+
+  const updates = {};
+  [["gastfamilieName", entry.gastfamilieName], ["gastfamilieAdresse", entry.gastfamilieAdresse], ["gastfamilieTelefon", entry.gastfamilieTelefon]]
+    .forEach(([field, value]) => {
+      if (!value) return;
+      const el = document.getElementById(field);
+      if (el && !el.value) {
+        el.value = value;
+        updates[field] = value;
+      }
+    });
+
+  if (Object.keys(updates).length === 0) return;
+  updates.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
+  try {
+    await docRef.set(updates, { merge: true });
+    setContactsStatus("Gastfamilie automatisch erkannt und ausgefüllt.");
+  } catch (e) {
+    // Felder sind trotzdem lokal ausgefüllt, nur das Speichern ist fehlgeschlagen
+  }
+  updateNotfallLinks();
 }
 
 function showPhotoPreview(dataUrl) {

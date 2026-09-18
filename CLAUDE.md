@@ -26,12 +26,17 @@ Bereits verwendet, alles kostenlos & ohne Account-Zwang:
 - `unterwegs.html` + `js/bus.js` — findet echte nächste Bushaltestelle zum Live-Standort,
   zeigt nur direkte (umsteigefreie) Busse zur Schule oder Gastfamilie
 - `naehe.html` + `js/places.js` — Restaurants/Läden live sortiert nach Standort
-- `gruppe.html` + `js/group.js` — Distanz vom Live-Standort zu fest hinterlegten
-  Mitschüler-Adressen (aktuell hartcodiert in group.js), PLUS `js/livemap.js`:
-  Live-Standortkarte der Gruppe (Leaflet + OSM), rein opt-in über einen Ein/Aus-Schalter,
-  aktualisiert nur solange die App offen ist. Zeigt den letzten bekannten Standort mit
-  Zeitangabe (z. B. "vor 12 Min") statt ihn zu verstecken, Marker werden grau statt lila
-  sobald über 2 Min alt. Beim Ausschalten wird der Firestore-Eintrag sofort gelöscht
+- `gruppe.html` + `js/group.js` — Distanz vom Live-Standort zu jedem Gastfamilien-
+  Haushalt aus der Firestore-Collection `roster` (einmalig aus der Excel-Liste der
+  Schule befüllt, Adressen über Nominatim/OpenStreetMap geokodiert — siehe
+  README.md "Wie die Zugangs-Freigabe funktioniert" / roster-Regeln). Kein
+  hartcodiertes JS mehr, da `js/group.js` sonst eine öffentlich abrufbare Datei mit
+  echten Namen/Adressen Minderjähriger wäre. Nur für bestätigte Personen sichtbar
+  (gleiche Zugangs-Freigabe wie der Rest). PLUS `js/livemap.js`: Live-Standortkarte
+  der Gruppe (Leaflet + OSM), rein opt-in über einen Ein/Aus-Schalter, aktualisiert
+  nur solange die App offen ist. Zeigt den letzten bekannten Standort mit Zeitangabe
+  (z. B. "vor 12 Min") statt ihn zu verstecken, Marker werden grau statt lila sobald
+  über 2 Min alt. Beim Ausschalten wird der Firestore-Eintrag sofort gelöscht
 - `mehr.html` — Währungsrechner (live), Rückreise-Checkliste (localStorage), Platzhalter
   für Stundenplan/Sozialprogramm
 - `notfall.html` + `js/contacts.js` — 999-Anruf-Button, Kontakte, Adressen. Name,
@@ -48,7 +53,11 @@ Bereits verwendet, alles kostenlos & ohne Account-Zwang:
   Firestore-Sicherheitsregeln selbst erzwungen (README.md) — eine Person kann sich
   nicht selbst freischalten, auch nicht über die Browser-Konsole. Solange nicht
   bestätigt, sieht man weder die Gruppen-Kontakte noch die Live-Standortkarte
-  (`gruppe.html`, ebenfalls hinter derselben Freigabe)
+  (`gruppe.html`, ebenfalls hinter derselben Freigabe). Name-Abgleich (Feature 5):
+  beim Eintragen des eigenen Namens wird gegen die Firestore-Collection `roster`
+  abgeglichen (`normalizeName()` in `js/contacts.js`) — bei Treffer werden
+  Gastfamilie-Name/Adresse/Telefon automatisch ausgefüllt (nur leere Felder, nie
+  eigene Korrekturen überschreiben)
 - `css/style.css` — gemeinsames Design: hell/dunkel automatisch über
   `prefers-color-scheme`, Apple-artige Optik (Systemschrift, Farbverläufe vermeiden,
   Karten mit Schatten statt Rahmen, Akzentfarbe `#0071E3`)
@@ -68,31 +77,22 @@ statt zu verschwinden (grau statt lila sobald über 2 Min alt). Feature 3 (Profi
 verkleinert und im selben Kontakt-Dokument gespeichert; erscheint als Avatar in der
 Gruppen-Kontaktliste (`notfall.html`) und auf der Live-Standortkarte (`gruppe.html`).
 Feature 4 (Zugangs-Freigabe, nachträglich von Angel gewünscht) — siehe oben unter
-`notfall.html`/`js/admin-config.js`.
+`notfall.html`/`js/admin-config.js`, Firestore-Regeln inkl. isAdmin()/isApproved()
+sind live und getestet (inkl. eines Bugfixes: `resource.data.status` wirft in
+Firestore-Regeln einen Fehler statt `undefined` zurückzugeben, wenn das Feld fehlt —
+jetzt überall `.get('status', null)` statt direktem Property-Zugriff). Feature 5
+(Namens-Abgleich, ebenfalls nachträglich gewünscht) — `js/contacts.js`
+(`handleNameChange`/`normalizeName`) plus die Firestore-Collection `roster` (24
+Personen aus Angels Excel-Liste, einmalig geokodiert und per Skript eingetragen,
+nicht im Git-Repo). `js/group.js` liest "Wohnen in deiner Nähe" jetzt live aus
+`roster` statt aus hartcodierten Daten.
 
-Alle ursprünglich geplanten Features sind damit umgesetzt.
+Alle bisher gewünschten Features sind damit umgesetzt und Ende-zu-Ende getestet
+(inkl. serverseitiger Durchsetzung der Zugangs-Freigabe, nicht nur UI-Versteck).
 
 Offen:
-- Die Firestore-Sicherheitsregeln in der Konsole müssen noch mit dem AKTUELLEN
-  Regeltext aus README.md ersetzt werden (enthält jetzt auch die Zugangs-Freigabe-Logik
-  für Feature 4 — der alte Regeltext ohne isAdmin()/isApproved() reicht nicht mehr aus).
-  `js/admin-config.js` hat bereits Angels echte ADMIN_UID (ZCdlly38pvSgaKwYUmi4COldlbZ2),
-  auch schon im README-Regeltext eingesetzt — nur noch in der Konsole einfügen.
 - Ein Test-Kontakt "Test Schueler" von Claudes eigenem Testen ist noch in der
   `contacts`-Collection und sollte von Angel gelöscht werden.
-- **Mitschüler-Adressliste (`js/group.js`):** Angel hat eine echte Namensliste mit
-  Gastfamilien-Adressen alle 24 Personen geliefert (Vor-/Nachname, Host, Adresse,
-  Postleitzahl — inkl. 2 erwachsener Betreuungspersonen). Alle Adressen wurden bereits
-  einmalig über Nominatim/OpenStreetMap geokodiert. ABER: das direkte Einbauen in
-  `js/group.js` wurde von der Auto-Mode-Sicherheitsprüfung blockiert ("Out-of-Place
-  Publication") — zu Recht, denn `js/group.js` ist eine statische Datei, die unabhängig
-  von jeder App-internen Zugangs-Freigabe direkt über die GitHub-Pages-URL abrufbar
-  wäre (keine Firestore-Regeln greifen dort). Für 24 echte Namen Minderjähriger +
-  Wohnadressen ist das nicht ausreichend geschützt. Empfehlung für den nächsten
-  Schritt: die Roster-Daten stattdessen in Firestore (`contacts`-Collection)
-  vorbefüllen statt in eine öffentliche JS-Datei zu schreiben, damit dieselben
-  Sicherheitsregeln greifen wie beim Rest der Gruppendaten. Noch nicht umgesetzt —
-  mit Angel abzustimmen, bevor das passiert.
 
 ## Vorgehen
 Bitte vor dem Loslegen kurz einen Plan vorschlagen (Datenstruktur in Firebase,

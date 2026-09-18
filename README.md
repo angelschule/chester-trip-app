@@ -10,7 +10,7 @@ Läuft komplett im Browser, kein Server, keine Kosten.
 | Wetter (Home) | **Live** – Open-Meteo, basierend auf deinem aktuellen Standort |
 | Wetter-Detailseite | **Live** – Stundenverlauf für heute (Temperatur, Regenwahrscheinlichkeit) plus Regenschirm-Hinweis, erreichbar per Tap auf die Wetterkarte auf Home |
 | In der Nähe | **Live** – OpenStreetMap, sortiert nach deiner echten Entfernung |
-| Gruppe | **Live-Distanz** zu festen Adressen, plus **Live-Standortkarte** der Gruppe (opt-in, siehe unten) |
+| Gruppe | **Live-Distanz** zu allen Gastfamilien-Adressen (aus Firestore, siehe unten), plus **Live-Standortkarte** der Gruppe (opt-in, siehe unten) — beides nur für bestätigte Personen sichtbar |
 | Unterwegs / Busse | **Echte Chester-Haltestellen & echter Fahrplan** (UK Bus Open Data Service), findet die nächste Haltestelle zu deinem Live-Standort und zeigt nur direkte Busse (ohne Umsteigen) zur Schule bzw. Gastfamilie. **Keine Live-GPS-Position** des Busses selbst (siehe unten) |
 | Stundenplan / Sozialprogramm | Platzhalter, noch einzutragen |
 | Währungsrechner | **Live** – Frankfurter.app (Wechselkurs der EZB) |
@@ -66,7 +66,8 @@ Kostenlose "Spark"-Stufe, keine Kreditkarte nötig, einmalig einzurichten:
 
        function isApproved() {
          return request.auth != null &&
-           get(/databases/$(database)/documents/contacts/$(request.auth.uid)).data.status == 'approved';
+           exists(/databases/$(database)/documents/contacts/$(request.auth.uid)) &&
+           get(/databases/$(database)/documents/contacts/$(request.auth.uid)).data.get('status', null) == 'approved';
        }
 
        match /contacts/{userId} {
@@ -79,9 +80,9 @@ Kostenlose "Spark"-Stufe, keine Kreditkarte nötig, einmalig einzurichten:
 
          allow update: if isAdmin() || (
            request.auth != null && request.auth.uid == userId && (
-             request.resource.data.status == resource.data.status ||
-             ((!('status' in resource.data) || resource.data.status == 'denied')
-               && request.resource.data.status == 'pending')
+             request.resource.data.get('status', null) == resource.data.get('status', null) ||
+             (resource.data.get('status', null) in [null, 'denied'] &&
+               request.resource.data.get('status', null) == 'pending')
            )
          );
 
@@ -93,9 +94,22 @@ Kostenlose "Spark"-Stufe, keine Kreditkarte nötig, einmalig einzurichten:
          allow write: if request.auth != null && request.auth.uid == userId && (isAdmin() || isApproved());
          allow delete: if request.auth != null && request.auth.uid == userId;
        }
+
+       match /roster/{docId} {
+         allow get: if request.auth != null;
+         allow list: if isAdmin() || isApproved();
+         allow write: if isAdmin();
+       }
      }
    }
    ```
+
+   `roster` enthält die vorbefüllten Gastfamilien-Daten aus der Excel-Liste (Name →
+   Gastfamilie/Adresse), damit beim ersten Eintragen des eigenen Namens automatisch die
+   passende Gastfamilie erkannt wird. `get` (einzelnen Eintrag nach Namen nachschlagen)
+   ist für jeden offen — das braucht man schon *vor* der Bestätigung. `list` (die ganze
+   Liste auf einmal) nur für Admin/bestätigte Personen. Schreiben kann nur das
+   Admin-Gerät (zum einmaligen Befüllen/Aktualisieren der Liste).
 
    Das bedeutet: jede Person kann **immer ihren eigenen** Kontakt-Eintrag lesen/anlegen
    (um ihren eigenen Anfrage-Status zu sehen), aber die Kontakte/Standorte der **ganzen
@@ -119,6 +133,20 @@ oben, nicht über Geheimhaltung dieser Werte.
 3. Erst nach deiner Bestätigung sieht diese Person die Kontakte der Gruppe und die
    Live-Standortkarte. Bei Ablehnung kann sie es erneut versuchen.
 
+### Wie der Namens-Abgleich funktioniert
+
+Beim Eintragen des eigenen Namens wird automatisch mit der Firestore-Collection
+`roster` abgeglichen (Groß-/Kleinschreibung und Leerzeichen spielen keine Rolle).
+Bei einem Treffer werden Gastfamilie-Name, -Adresse und -Telefon automatisch
+eingetragen — aber **nur leere Felder**, eigene Korrekturen werden nie überschrieben.
+`roster` wurde einmalig von Claude aus Angels Excel-Liste befüllt (24 Personen, über
+Nominatim/OpenStreetMap geokodiert) — die Rohdaten liegen bewusst **nicht** im
+Git-Repo, sondern nur in Firestore, weil `js/group.js` sonst eine öffentlich
+abrufbare Datei mit echten Namen/Adressen Minderjähriger wäre. Falls sich die Liste
+ändert (neue Person, andere Gastfamilie), sag mir Bescheid, dann trage ich das direkt
+in Firestore nach (kein erneutes Firestore-Regel-Gefrickel nötig, solange die
+`roster`-Regeln aus Schritt 7 oben bereits stehen).
+
 ## 1. Auf GitHub Pages veröffentlichen (kostenlos)
 
 1. Alle Dateien aus diesem Ordner in dein Repository hochladen (Struktur beibehalten: `css/`, `js/`, `icons/` bleiben Unterordner).
@@ -132,8 +160,8 @@ Wichtig: Safari muss verwendet werden (nicht Chrome/Firefox auf iOS) und die Sei
 
 - **`index.html`** und **`mehr.html`**: Stundenplan und Sozialprogramm, sobald du sie von der Schule hast (im Text markiert mit "Noch nicht hinterlegt").
 - **`js/firebase-config.js`**: siehe Abschnitt "Firebase einrichten" oben – ohne diese Werte funktionieren die geteilten Notfallkontakte nicht (Versicherungsdaten bleiben aber immer lokal).
-- **`notfall.html`**: Name, Profilbild, Gastfamilie und Betreuung trägt jede Person direkt in der App ein (wird geteilt); Versicherungsdaten trägst du ebenfalls direkt ein, bleiben aber nur lokal gespeichert.
-- **`js/group.js`**: falls sich die Namen/Adressen deiner Mitschüler noch ändern.
+- **`notfall.html`**: Name, Profilbild, Gastfamilie und Betreuung trägt jede Person direkt in der App ein (wird geteilt, bei bekanntem Namen automatisch mit Gastfamilie vorausgefüllt); Versicherungsdaten trägst du ebenfalls direkt ein, bleiben aber nur lokal gespeichert.
+- **Roster-Liste (Firestore, nicht im Repo)**: falls sich Namen/Adressen deiner Mitschüler ändern, sag mir Bescheid — ich trage das direkt in Firestore nach.
 
 ## 3. Grenzen, die du kennen solltest
 
