@@ -43,12 +43,16 @@ function updateToggleUI(on) {
   if (toggle) toggle.setAttribute("aria-checked", on ? "true" : "false");
 }
 
+let liveMapWired = false;
+
+function setMapAccessView(approved) {
+  const gate = document.getElementById("access-gate");
+  const content = document.getElementById("map-content");
+  if (gate) gate.style.display = approved ? "none" : "block";
+  if (content) content.style.display = approved ? "flex" : "none";
+}
+
 async function initLiveMap() {
-  initLiveMapView();
-
-  const toggle = document.getElementById("location-toggle");
-  if (toggle) toggle.addEventListener("click", toggleLocationSharing);
-
   const db = getContactsDb();
   if (!db) {
     setLocationStatus("Firebase noch nicht eingerichtet.");
@@ -61,6 +65,25 @@ async function initLiveMap() {
     setLocationStatus("Verbindung fehlgeschlagen — bitte später erneut versuchen.");
     return;
   }
+
+  db.collection("contacts").doc(contactsUid).onSnapshot((snap) => {
+    const data = snap.exists ? snap.data() : {};
+    const approved = isAdminUser() || data.status === "approved";
+    setMapAccessView(approved);
+    if (approved) wireUpLiveMap();
+  }, () => {
+    setMapAccessView(false);
+  });
+}
+
+function wireUpLiveMap() {
+  if (liveMapWired) return;
+  liveMapWired = true;
+
+  initLiveMapView();
+
+  const toggle = document.getElementById("location-toggle");
+  if (toggle) toggle.addEventListener("click", toggleLocationSharing);
 
   if (isSharingEnabled()) {
     startSharing();

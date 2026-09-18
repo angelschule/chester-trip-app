@@ -45,30 +45,79 @@ Kostenlose "Spark"-Stufe, keine Kreditkarte nötig, einmalig einzurichten:
    Dadurch bekommt jedes Gerät eine feste ID, ohne dass sich jemand mit Passwort anmelden muss.
 4. **Firestore Database** (linkes Menü) → **Datenbank erstellen** → Produktionsmodus,
    Standort z. B. `europe-west`.
-5. Im Firestore-Reiter **Regeln** den folgenden Text einfügen und veröffentlichen:
+5. Die 6 Werte aus Schritt 2 in `js/firebase-config.js` eintragen, committen & pushen.
+6. **Deine eigene Geräte-ID finden**, um dich als Admin einzutragen: App öffnen (z. B.
+   lokal, siehe unten, oder schon live auf GitHub Pages) → Tab **Mehr** öffnen → ganz
+   unten steht "Geräte-ID: …". Diesen Wert in `js/admin-config.js` bei `ADMIN_UID`
+   eintragen (ersetzt `"HIER-EINTRAGEN"`), committen & pushen. Nur dieses Gerät sieht
+   danach die Liste offener Zugangs-Anfragen und kann sie bestätigen/ablehnen.
+7. Im Firestore-Reiter **Regeln** den folgenden Text einfügen (dabei
+   `HIER-DEINE-ADMIN-UID` durch denselben Wert wie in Schritt 6 ersetzen) und
+   veröffentlichen:
 
    ```
    rules_version = '2';
    service cloud.firestore {
      match /databases/{database}/documents {
-       match /contacts/{userId} {
-         allow read: if request.auth != null;
-         allow write: if request.auth != null && request.auth.uid == userId;
+
+       function isAdmin() {
+         return request.auth != null && request.auth.uid == "HIER-DEINE-ADMIN-UID";
        }
+
+       function isApproved() {
+         return request.auth != null &&
+           get(/databases/$(database)/documents/contacts/$(request.auth.uid)).data.status == 'approved';
+       }
+
+       match /contacts/{userId} {
+         allow read: if request.auth != null && (
+           request.auth.uid == userId || isAdmin() || isApproved()
+         );
+
+         allow create: if request.auth != null && request.auth.uid == userId &&
+           (!('status' in request.resource.data) || request.resource.data.status == 'pending');
+
+         allow update: if isAdmin() || (
+           request.auth != null && request.auth.uid == userId && (
+             request.resource.data.status == resource.data.status ||
+             ((!('status' in resource.data) || resource.data.status == 'denied')
+               && request.resource.data.status == 'pending')
+           )
+         );
+
+         allow delete: if isAdmin() || (request.auth != null && request.auth.uid == userId);
+       }
+
        match /locations/{userId} {
-         allow read: if request.auth != null;
-         allow write: if request.auth != null && request.auth.uid == userId;
+         allow read: if isAdmin() || isApproved();
+         allow write: if request.auth != null && request.auth.uid == userId && (isAdmin() || isApproved());
+         allow delete: if request.auth != null && request.auth.uid == userId;
        }
      }
    }
    ```
 
-   Das bedeutet: jede angemeldete (anonyme) Person kann alle Kontakte und Standorte
-   lesen, aber nur ihren eigenen Eintrag schreiben oder löschen.
-6. Die 6 Werte aus Schritt 2 in `js/firebase-config.js` eintragen, committen & pushen.
+   Das bedeutet: jede Person kann **immer ihren eigenen** Kontakt-Eintrag lesen/anlegen
+   (um ihren eigenen Anfrage-Status zu sehen), aber die Kontakte/Standorte der **ganzen
+   Gruppe** sieht nur, wer entweder das Admin-Gerät ist oder bereits bestätigt
+   (`status: "approved"`) wurde. Den eigenen Status auf `"approved"` setzen kann nur
+   das Admin-Gerät — eine Person kann sich also nicht selbst freischalten, auch nicht
+   über die Browser-Konsole.
 
-Diese Werte sind nicht geheim – sie identifizieren nur das Projekt. Der eigentliche
-Schutz läuft über die Sicherheitsregeln aus Schritt 5, nicht über Geheimhaltung der Config.
+Diese Werte (Firebase-Config und Admin-UID) sind nicht geheim – sie identifizieren nur
+das Projekt bzw. ein Gerät. Der eigentliche Schutz läuft über die Sicherheitsregeln
+oben, nicht über Geheimhaltung dieser Werte.
+
+### Wie die Zugangs-Freigabe funktioniert
+
+1. Eine neue Person öffnet die App, trägt unter **Notfall → Mein Name** ihren Namen ein
+   und tippt auf **"Zugang anfragen"**.
+2. Auf deinem (Admin-)Gerät erscheint die Anfrage oben auf der Notfall-Seite unter
+   "Offene Anfragen" — du tippst auf ✓ (erlauben) oder ✕ (ablehnen). Das siehst du
+   erst, wenn du die App selbst öffnest — eine echte Push-Benachrichtigung wäre nur
+   mit einer kostenpflichtigen Firebase-Stufe möglich (siehe Absage dazu im Chat).
+3. Erst nach deiner Bestätigung sieht diese Person die Kontakte der Gruppe und die
+   Live-Standortkarte. Bei Ablehnung kann sie es erneut versuchen.
 
 ## 1. Auf GitHub Pages veröffentlichen (kostenlos)
 

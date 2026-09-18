@@ -16,7 +16,9 @@ Bereits verwendet, alles kostenlos & ohne Account-Zwang:
 - GitHub Pages (Hosting)
 - Firebase, kostenlose "Spark"-Stufe (Firestore + Anonymous Auth) — seit Feature 1
   im Einsatz für geteilte Notfallkontakte, Config in js/firebase-config.js, Setup
-  in README.md unter "Firebase einrichten"
+  in README.md unter "Firebase einrichten". Echte Push-Benachrichtigungen (z. B. für
+  Zugangs-Anfragen) würden Cloud Functions + die kostenpflichtige "Blaze"-Stufe
+  brauchen (Zahlungsmethode nötig) — deshalb bewusst NICHT eingebaut, siehe Feature 4
 
 ## Aktueller Stand (bereits gebaut, funktioniert)
 - `index.html` — Home: Wetter-Kurzkarte (verlinkt zu wetter.html), Schnellzugriffe, Tagesübersicht
@@ -37,9 +39,16 @@ Bereits verwendet, alles kostenlos & ohne Account-Zwang:
   Firebase gespeichert und für die ganze Gruppe sichtbar (nicht mehr nur pro Gerät).
   Profilbilder werden im Browser vor dem Hochladen auf 200×200px verkleinert (Canvas
   API) und als Data-URL im selben Kontakt-Dokument gespeichert — kein separater
-  Speicherdienst nötig, keine zusätzlichen Firestore-Regeln erforderlich. Nur die
-  Versicherungsdaten bleiben bewusst lokal im `localStorage` (sensibler, nicht
-  gruppenrelevant) — siehe `js/notfall.js`
+  Speicherdienst nötig. Nur die Versicherungsdaten bleiben bewusst lokal im
+  `localStorage` (sensibler, nicht gruppenrelevant) — siehe `js/notfall.js`.
+  Zugangs-Freigabe (Feature 4): neue Personen tragen ihren Namen ein und tippen auf
+  "Zugang anfragen" (status:"pending"); nur das Admin-Gerät (`js/admin-config.js`,
+  `ADMIN_UID`) sieht die Liste offener Anfragen (oben auf `notfall.html`) und kann
+  bestätigen/ablehnen. Wird nicht nur im UI versteckt, sondern in den
+  Firestore-Sicherheitsregeln selbst erzwungen (README.md) — eine Person kann sich
+  nicht selbst freischalten, auch nicht über die Browser-Konsole. Solange nicht
+  bestätigt, sieht man weder die Gruppen-Kontakte noch die Live-Standortkarte
+  (`gruppe.html`, ebenfalls hinter derselben Freigabe)
 - `css/style.css` — gemeinsames Design: hell/dunkel automatisch über
   `prefers-color-scheme`, Apple-artige Optik (Systemschrift, Farbverläufe vermeiden,
   Karten mit Schatten statt Rahmen, Akzentfarbe `#0071E3`)
@@ -58,12 +67,30 @@ statt zu verschwinden (grau statt lila sobald über 2 Min alt). Feature 3 (Profi
 — siehe `notfall.html` + `js/contacts.js`, Bild wird im Browser auf 200×200px
 verkleinert und im selben Kontakt-Dokument gespeichert; erscheint als Avatar in der
 Gruppen-Kontaktliste (`notfall.html`) und auf der Live-Standortkarte (`gruppe.html`).
+Feature 4 (Zugangs-Freigabe, nachträglich von Angel gewünscht) — siehe oben unter
+`notfall.html`/`js/admin-config.js`.
 
-Alle drei ursprünglich geplanten Features sind damit umgesetzt.
+Alle ursprünglich geplanten Features sind damit umgesetzt.
 
-Offen: die Firestore-Sicherheitsregeln in der Konsole müssen noch um die
-`locations`-Collection erweitert werden (Angel macht das selbst, Regeltext steht in
-README.md unter "Firebase einrichten").
+Offen:
+- Die Firestore-Sicherheitsregeln in der Konsole müssen noch mit dem AKTUELLEN
+  Regeltext aus README.md ersetzt werden (enthält jetzt auch die Zugangs-Freigabe-Logik
+  für Feature 4 — der alte Regeltext ohne isAdmin()/isApproved() reicht nicht mehr aus).
+- `js/admin-config.js` braucht noch Angels echte ADMIN_UID (siehe README.md,
+  "Deine eigene Geräte-ID finden").
+- **Mitschüler-Adressliste (`js/group.js`):** Angel hat eine echte Namensliste mit
+  Gastfamilien-Adressen alle 24 Personen geliefert (Vor-/Nachname, Host, Adresse,
+  Postleitzahl — inkl. 2 erwachsener Betreuungspersonen). Alle Adressen wurden bereits
+  einmalig über Nominatim/OpenStreetMap geokodiert. ABER: das direkte Einbauen in
+  `js/group.js` wurde von der Auto-Mode-Sicherheitsprüfung blockiert ("Out-of-Place
+  Publication") — zu Recht, denn `js/group.js` ist eine statische Datei, die unabhängig
+  von jeder App-internen Zugangs-Freigabe direkt über die GitHub-Pages-URL abrufbar
+  wäre (keine Firestore-Regeln greifen dort). Für 24 echte Namen Minderjähriger +
+  Wohnadressen ist das nicht ausreichend geschützt. Empfehlung für den nächsten
+  Schritt: die Roster-Daten stattdessen in Firestore (`contacts`-Collection)
+  vorbefüllen statt in eine öffentliche JS-Datei zu schreiben, damit dieselben
+  Sicherheitsregeln greifen wie beim Rest der Gruppendaten. Noch nicht umgesetzt —
+  mit Angel abzustimmen, bevor das passiert.
 
 ## Vorgehen
 Bitte vor dem Loslegen kurz einen Plan vorschlagen (Datenstruktur in Firebase,

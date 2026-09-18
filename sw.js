@@ -2,7 +2,7 @@
 // (with the last-seen content) without a network connection.
 // Live data (weather, nearby places, exchange rates) still needs internet.
 
-const CACHE_NAME = "chester-app-v6";
+const CACHE_NAME = "chester-app-v7";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -22,6 +22,7 @@ const APP_SHELL = [
   "./js/notfall.js",
   "./js/contacts.js",
   "./js/firebase-config.js",
+  "./js/admin-config.js",
   "./js/group.js",
   "./js/livemap.js",
   "./js/chester-stops.json",

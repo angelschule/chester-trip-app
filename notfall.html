@@ -22,6 +22,11 @@
 
   <div class="page-content">
 
+    <div id="admin-requests-section" style="display:none;">
+      <div class="section-label">Offene Anfragen</div>
+      <div id="admin-requests-list" style="display:flex;flex-direction:column;gap:10px;"></div>
+    </div>
+
     <a href="tel:999" style="background:var(--danger);color:#FFFFFF;border-radius:18px;padding:18px;display:flex;align-items:center;gap:14px;transition:background-color .15s ease;">
       <div style="flex:none;width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,0.22);display:flex;align-items:center;justify-content:center;">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6.6 10.8c1.4 2.8 3.8 5.2 6.6 6.6l2.2-2.2c.3-.3.7-.4 1.1-.3 1.2.4 2.5.6 3.8.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.6.6 3.8.1.4 0 .8-.3 1.1L6.6 10.8Z"></path></svg>
@@ -43,6 +48,24 @@
           <label for="name" style="margin-bottom:2px;">Mein Name</label>
           <input type="text" id="name" placeholder="Vor- und Nachname">
         </div>
+
+        <div id="access-request-card" class="card" style="display:none;">
+          <div style="font-size:13px;margin-bottom:10px;">Damit die Gruppe dich sieht, muss Angel deinen Zugang einmal bestätigen.</div>
+          <button id="request-access-btn" class="primary-btn" style="padding:10px;font-size:13px;">Zugang anfragen</button>
+        </div>
+
+        <div id="access-pending-banner" class="card" style="display:none;">
+          <div style="font-weight:600;font-size:13.5px;">Warte auf Bestätigung</div>
+          <div class="secondary" style="font-size:12px;margin-top:4px;">Angel muss deinen Zugang einmal freischalten — sobald das passiert, siehst du hier automatisch die Gruppe.</div>
+        </div>
+
+        <div id="access-denied-banner" class="card" style="display:none;">
+          <div style="font-weight:600;font-size:13.5px;color:var(--danger);">Anfrage abgelehnt</div>
+          <div class="secondary" style="font-size:12px;margin-top:4px;">Wende dich direkt an Angel, oder versuche es noch einmal.</div>
+          <button id="retry-access-btn" class="primary-btn" style="padding:10px;font-size:13px;margin-top:10px;">Erneut anfragen</button>
+        </div>
+
+        <div id="member-content" style="display:none;flex-direction:column;gap:10px;">
 
         <div class="card" style="display:flex;align-items:center;gap:14px;">
           <div style="flex:none;position:relative;width:56px;height:56px;">
@@ -92,10 +115,12 @@
 
         <div class="secondary" style="font-size:11px;">Name, Gastfamilie und Betreuung werden zentral gespeichert und sind für deine ganze Gruppe sichtbar, damit ihr euch gegenseitig erreichen könnt.</div>
 
+        </div>
+
       </div>
     </div>
 
-    <div>
+    <div id="group-section" style="display:none;">
       <div class="section-label">Kontakte der Gruppe</div>
       <div id="group-contacts-list" style="display:flex;flex-direction:column;gap:10px;">
         <div class="empty-state">Wird geladen …</div>
@@ -159,6 +184,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
 <script src="js/firebase-config.js"></script>
+<script src="js/admin-config.js"></script>
 <script src="js/contacts.js"></script>
 <script src="js/notfall.js"></script>
 <script>initNotfallForm();</script>

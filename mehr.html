@@ -74,6 +74,8 @@
       <div id="checklist" style="display:flex;flex-direction:column;gap:11px;"></div>
     </div>
 
+    <div class="secondary" style="font-size:10.5px;text-align:center;padding:0 12px;">Geräte-ID (nur für die Admin-Einrichtung nötig, siehe README.md): <span id="device-uid">wird geladen …</span></div>
+
   </div>
 
   <div class="bottom-nav">
@@ -101,11 +103,28 @@
 
 </div>
 
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="js/firebase-config.js"></script>
+<script src="js/admin-config.js"></script>
+<script src="js/contacts.js"></script>
 <script src="js/currency.js"></script>
 <script src="js/checklist.js"></script>
 <script>
   loadRates();
   renderChecklist();
+  (async () => {
+    const db = getContactsDb();
+    const el = document.getElementById("device-uid");
+    if (!db || !el) return;
+    try {
+      const uid = await waitForAnonymousAuth();
+      el.textContent = uid;
+    } catch (e) {
+      el.textContent = "nicht verfügbar";
+    }
+  })();
 </script>
 </body>
 </html>
