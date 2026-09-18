@@ -14,6 +14,9 @@ Bereits verwendet, alles kostenlos & ohne Account-Zwang:
 - UK Bus Open Data Service / GTFS (echte Chester-Bushaltestellen & Fahrplan,
   vorverarbeitet in js/chester-stops.json und js/chester-bus-connections.json)
 - GitHub Pages (Hosting)
+- Firebase, kostenlose "Spark"-Stufe (Firestore + Anonymous Auth) — seit Feature 1
+  im Einsatz für geteilte Notfallkontakte, Config in js/firebase-config.js, Setup
+  in README.md unter "Firebase einrichten"
 
 ## Aktueller Stand (bereits gebaut, funktioniert)
 - `index.html` — Home: Wetter-Kurzkarte (verlinkt zu wetter.html), Schnellzugriffe, Tagesübersicht
@@ -25,8 +28,11 @@ Bereits verwendet, alles kostenlos & ohne Account-Zwang:
   Mitschüler-Adressen (aktuell hartcodiert in group.js)
 - `mehr.html` — Währungsrechner (live), Rückreise-Checkliste (localStorage), Platzhalter
   für Stundenplan/Sozialprogramm
-- `notfall.html` — 999-Anruf-Button, Kontakte, Adressen; Telefonnummern etc. aktuell nur
-  lokal im `localStorage` gespeichert (pro Gerät, nicht geteilt)
+- `notfall.html` + `js/contacts.js` — 999-Anruf-Button, Kontakte, Adressen. Name,
+  Gastfamilie (Name/Adresse/Telefon) und Betreuung sind jetzt zentral in Firebase
+  gespeichert und für die ganze Gruppe sichtbar (nicht mehr nur pro Gerät). Nur die
+  Versicherungsdaten bleiben bewusst lokal im `localStorage` (sensibler, nicht
+  gruppenrelevant) — siehe `js/notfall.js`
 - `css/style.css` — gemeinsames Design: hell/dunkel automatisch über
   `prefers-color-scheme`, Apple-artige Optik (Systemschrift, Farbverläufe vermeiden,
   Karten mit Schatten statt Rahmen, Akzentfarbe `#0071E3`)
@@ -34,17 +40,16 @@ Bereits verwendet, alles kostenlos & ohne Account-Zwang:
 
 ## Nächste Schritte (das will Angel jetzt umsetzen)
 
-Wichtige Änderung: dafür wird zum ersten Mal eine **zentrale Datenbank** gebraucht
-(bisher lief alles nur lokal pro Handy). Empfehlung: **Firebase**, kostenlose
-"Spark"-Stufe, keine Kreditkarte nötig. Alternative wäre Supabase (auch kostenlos),
-aber Firebase hat die einfachere Anbindung für reines Frontend ohne eigenen Server.
+Firebase (kostenlose "Spark"-Stufe, keine Kreditkarte nötig) ist seit Feature 1 im
+Einsatz — Setup siehe README.md, Config in `js/firebase-config.js`.
 
-1. **Selbst eintragbare Kontakte/Adressen**: jeder Schüler soll seine eigene
-   Gastfamilien-Adresse und Notfallkontakte eintragen können (nicht alle haben die
-   gleiche Gastfamilie wie Angel). Muss zentral gespeichert werden (Firebase), damit
-   alle in der Gruppe die Liste sehen — nicht mehr nur lokal wie aktuell in `notfall.html`.
+**Erledigt:** Feature 1 (selbst eintragbare Kontakte/Adressen) — siehe `notfall.html` +
+`js/contacts.js`. Offen: `js/firebase-config.js` muss noch mit echten Projekt-Werten
+befüllt werden (Angel legt das Firebase-Projekt selbst an, siehe README.md).
 
-2. **Live-Standort-Übersicht ("Snap Map"-Stil)**: eine Karte, auf der man sieht, wer
+Noch offen:
+
+1. **Live-Standort-Übersicht ("Snap Map"-Stil)**: eine Karte, auf der man sieht, wer
    von der Gruppe gerade wo ist — nur wenn diese Person das aktiv erlaubt hat.
    Wichtige Einschränkung, die Angel schon kennt: Standort aktualisiert sich nur,
    solange die App bei der jeweiligen Person offen ist (kein Hintergrund-Tracking,
@@ -55,7 +60,7 @@ aber Firebase hat die einfachere Anbindung für reines Frontend ohne eigenen Ser
    - einen klaren, jederzeit widerrufbaren Ein/Aus-Schalter pro Person — das ist
      nicht optional, sondern Voraussetzung, bevor das Feature live geht
 
-3. **Profilbilder**: einfachste kostenlose Umsetzung — Bild im Browser vor dem
+2. **Profilbilder**: einfachste kostenlose Umsetzung — Bild im Browser vor dem
    Hochladen auf z. B. 200×200px verkleinern (Canvas API) und zusammen mit den
    restlichen Daten in Firebase speichern. Kein separater Speicherdienst nötig.
 

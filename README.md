@@ -14,7 +14,8 @@ Läuft komplett im Browser, kein Server, keine Kosten.
 | Unterwegs / Busse | **Echte Chester-Haltestellen & echter Fahrplan** (UK Bus Open Data Service), findet die nächste Haltestelle zu deinem Live-Standort und zeigt nur direkte Busse (ohne Umsteigen) zur Schule bzw. Gastfamilie. **Keine Live-GPS-Position** des Busses selbst (siehe unten) |
 | Stundenplan / Sozialprogramm | Platzhalter, noch einzutragen |
 | Währungsrechner | **Live** – Frankfurter.app (Wechselkurs der EZB) |
-| Checkliste, Notfall-Kontakte | Werden lokal auf deinem Gerät gespeichert (`localStorage`), nirgendwo hochgeladen |
+| Checkliste, Versicherungsdaten | Werden lokal auf deinem Gerät gespeichert (`localStorage`), nirgendwo hochgeladen |
+| Notfall-Kontakte (Name, Gastfamilie, Betreuung) | **Live, geteilt** – zentral in Firebase gespeichert, jede Person sieht die Einträge der ganzen Gruppe (siehe Abschnitt "Firebase einrichten" unten) |
 
 ### Wie die Busdaten funktionieren
 
@@ -28,6 +29,41 @@ Service für Nordwest-England erzeugt – Snapshot vom 18.09.2026. Das bedeutet:
 - **Einschränkung:** der Fahrplan-Snapshot berücksichtigt reguläre Wochentags-/Wochenend-Muster, aber keine kurzfristigen Ausnahmen (Feiertage, Umleitungen). Für ganz aktuelle Änderungen im Zweifel bei [Traveline](https://www.traveline.info) nachschauen.
 - Falls sich der Fahrplan über die Zeit ändert, können die beiden JSON-Dateien bei Bedarf neu erzeugt werden (sag mir Bescheid, dann mache ich das).
 
+## Firebase einrichten (für geteilte Notfallkontakte)
+
+Damit die ganze Gruppe die Kontakte/Adressen sehen kann, braucht `notfall.html` ein
+Firebase-Projekt. Kostenlose "Spark"-Stufe, keine Kreditkarte nötig, einmalig einzurichten:
+
+1. [console.firebase.google.com](https://console.firebase.google.com) → **Projekt hinzufügen** → Namen vergeben (z. B. `chester-trip-app`).
+2. **Projekteinstellungen** (Zahnrad oben links) → Reiter **Allgemein** → ganz unten bei
+   "Meine Apps" auf das Web-Symbol (`</>`) klicken → App registrieren (Firebase Hosting
+   überspringen, wird nicht gebraucht). Der angezeigte `firebaseConfig`-Block sind genau
+   die Werte für `js/firebase-config.js`.
+3. **Authentication** (linkes Menü) → "Erste Schritte" → Anbieter **Anonym** aktivieren.
+   Dadurch bekommt jedes Gerät eine feste ID, ohne dass sich jemand mit Passwort anmelden muss.
+4. **Firestore Database** (linkes Menü) → **Datenbank erstellen** → Produktionsmodus,
+   Standort z. B. `europe-west`.
+5. Im Firestore-Reiter **Regeln** den folgenden Text einfügen und veröffentlichen:
+
+   ```
+   rules_version = '2';
+   service cloud.firestore {
+     match /databases/{database}/documents {
+       match /contacts/{userId} {
+         allow read: if request.auth != null;
+         allow write: if request.auth != null && request.auth.uid == userId;
+       }
+     }
+   }
+   ```
+
+   Das bedeutet: jede angemeldete (anonyme) Person kann alle Kontakte lesen, aber nur
+   ihren eigenen Eintrag schreiben.
+6. Die 6 Werte aus Schritt 2 in `js/firebase-config.js` eintragen, committen & pushen.
+
+Diese Werte sind nicht geheim – sie identifizieren nur das Projekt. Der eigentliche
+Schutz läuft über die Sicherheitsregeln aus Schritt 5, nicht über Geheimhaltung der Config.
+
 ## 1. Auf GitHub Pages veröffentlichen (kostenlos)
 
 1. Alle Dateien aus diesem Ordner in dein Repository hochladen (Struktur beibehalten: `css/`, `js/`, `icons/` bleiben Unterordner).
@@ -40,7 +76,8 @@ Wichtig: Safari muss verwendet werden (nicht Chrome/Firefox auf iOS) und die Sei
 ## 2. Was du noch selbst eintragen solltest
 
 - **`index.html`** und **`mehr.html`**: Stundenplan und Sozialprogramm, sobald du sie von der Schule hast (im Text markiert mit "Noch nicht hinterlegt").
-- **`notfall.html`**: Telefonnummer der Gastfamilie, Name/Nummer der Reiseleitung, Versicherungsdaten – trägst du direkt in der App ein, wird lokal gespeichert.
+- **`js/firebase-config.js`**: siehe Abschnitt "Firebase einrichten" oben – ohne diese Werte funktionieren die geteilten Notfallkontakte nicht (Versicherungsdaten bleiben aber immer lokal).
+- **`notfall.html`**: Name, Gastfamilie und Betreuung trägt jede Person direkt in der App ein (wird geteilt); Versicherungsdaten trägst du ebenfalls direkt ein, bleiben aber nur lokal gespeichert.
 - **`js/group.js`**: falls sich die Namen/Adressen deiner Mitschüler noch ändern.
 
 ## 3. Grenzen, die du kennen solltest
