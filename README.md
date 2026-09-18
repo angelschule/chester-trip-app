@@ -49,7 +49,7 @@ Kostenlose "Spark"-Stufe, keine Kreditkarte nötig, einmalig einzurichten:
 6. **Deine eigene Geräte-ID finden**, um dich als Admin einzutragen: App öffnen (z. B.
    lokal, siehe unten, oder schon live auf GitHub Pages) → Tab **Mehr** öffnen → ganz
    unten steht "Geräte-ID: …". Dieser Wert steht bereits in `js/admin-config.js` bei
-   `ADMIN_UID` (`ZCdlly38pvSgaKwYUmi4COldlbZ2`) — nur dieses Gerät sieht danach die
+   `ADMIN_UID` (`uYSqD97zbgcUJPrbrGXcc9FlPvG3`) — nur dieses Gerät sieht danach die
    Liste offener Zugangs-Anfragen und kann sie bestätigen/ablehnen. Falls du die App
    mal auf einem anderen Gerät als Admin nutzen willst, hier bzw. mit mir aktualisieren.
 7. Im Firestore-Reiter **Regeln** den folgenden Text einfügen (Admin-UID ist schon
@@ -61,7 +61,7 @@ Kostenlose "Spark"-Stufe, keine Kreditkarte nötig, einmalig einzurichten:
      match /databases/{database}/documents {
 
        function isAdmin() {
-         return request.auth != null && request.auth.uid == "ZCdlly38pvSgaKwYUmi4COldlbZ2";
+         return request.auth != null && request.auth.uid == "uYSqD97zbgcUJPrbrGXcc9FlPvG3";
        }
 
        function isApproved() {
@@ -121,6 +121,13 @@ Kostenlose "Spark"-Stufe, keine Kreditkarte nötig, einmalig einzurichten:
 Diese Werte (Firebase-Config und Admin-UID) sind nicht geheim – sie identifizieren nur
 das Projekt bzw. ein Gerät. Der eigentliche Schutz läuft über die Sicherheitsregeln
 oben, nicht über Geheimhaltung dieser Werte.
+
+**Wichtig, besonders für dich als Admin:** die Geräte-ID hängt an der anonymen
+Anmeldung, die im Browser-Speicher liegt. **Browser-Verlauf/Website-Daten für diese
+Seite zu löschen erzeugt eine komplett neue ID** (und du verlierst deinen
+Admin-Status, bis `ADMIN_UID` neu gesetzt wird). Zum Beheben von Problemen reicht in
+der Regel: App komplett schliessen und neu öffnen — das behält die ID, anders als
+Website-Daten löschen.
 
 ### Wie die Zugangs-Freigabe funktioniert
 
