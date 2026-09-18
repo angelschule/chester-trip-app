@@ -15,7 +15,7 @@ Läuft komplett im Browser, kein Server, keine Kosten.
 | Stundenplan / Sozialprogramm | Platzhalter, noch einzutragen |
 | Währungsrechner | **Live** – Frankfurter.app (Wechselkurs der EZB) |
 | Checkliste, Versicherungsdaten | Werden lokal auf deinem Gerät gespeichert (`localStorage`), nirgendwo hochgeladen |
-| Notfall-Kontakte (Name, Gastfamilie, Betreuung) | **Live, geteilt** – zentral in Firebase gespeichert, jede Person sieht die Einträge der ganzen Gruppe (siehe Abschnitt "Firebase einrichten" unten) |
+| Notfall-Kontakte (Name, Gastfamilie, Betreuung, Profilbild) | **Live, geteilt** – zentral in Firebase gespeichert, jede Person sieht die Einträge der ganzen Gruppe (siehe Abschnitt "Firebase einrichten" unten). Profilbilder werden vor dem Hochladen im Browser auf 200×200px verkleinert |
 | Live-Standortkarte (Gruppe) | **Live, opt-in** – nur Personen, die den Schalter aktiv eingeschaltet haben, sind sichtbar; Standort wird alle ~45s aktualisiert, nur solange die App offen ist. Zeigt den letzten bekannten Standort mit Zeitangabe (z. B. "vor 12 Min"), Marker werden grau statt lila sobald sie seit über 2 Min nicht mehr aktualisiert wurden. Beim Ausschalten wird der Eintrag sofort gelöscht (Leaflet + OpenStreetMap-Kacheln, kostenlos, kein Google-Maps-Konto) |
 
 ### Wie die Busdaten funktionieren
@@ -83,7 +83,7 @@ Wichtig: Safari muss verwendet werden (nicht Chrome/Firefox auf iOS) und die Sei
 
 - **`index.html`** und **`mehr.html`**: Stundenplan und Sozialprogramm, sobald du sie von der Schule hast (im Text markiert mit "Noch nicht hinterlegt").
 - **`js/firebase-config.js`**: siehe Abschnitt "Firebase einrichten" oben – ohne diese Werte funktionieren die geteilten Notfallkontakte nicht (Versicherungsdaten bleiben aber immer lokal).
-- **`notfall.html`**: Name, Gastfamilie und Betreuung trägt jede Person direkt in der App ein (wird geteilt); Versicherungsdaten trägst du ebenfalls direkt ein, bleiben aber nur lokal gespeichert.
+- **`notfall.html`**: Name, Profilbild, Gastfamilie und Betreuung trägt jede Person direkt in der App ein (wird geteilt); Versicherungsdaten trägst du ebenfalls direkt ein, bleiben aber nur lokal gespeichert.
 - **`js/group.js`**: falls sich die Namen/Adressen deiner Mitschüler noch ändern.
 
 ## 3. Grenzen, die du kennen solltest

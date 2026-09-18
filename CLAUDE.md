@@ -33,8 +33,11 @@ Bereits verwendet, alles kostenlos & ohne Account-Zwang:
 - `mehr.html` — Währungsrechner (live), Rückreise-Checkliste (localStorage), Platzhalter
   für Stundenplan/Sozialprogramm
 - `notfall.html` + `js/contacts.js` — 999-Anruf-Button, Kontakte, Adressen. Name,
-  Gastfamilie (Name/Adresse/Telefon) und Betreuung sind jetzt zentral in Firebase
-  gespeichert und für die ganze Gruppe sichtbar (nicht mehr nur pro Gerät). Nur die
+  Profilbild, Gastfamilie (Name/Adresse/Telefon) und Betreuung sind jetzt zentral in
+  Firebase gespeichert und für die ganze Gruppe sichtbar (nicht mehr nur pro Gerät).
+  Profilbilder werden im Browser vor dem Hochladen auf 200×200px verkleinert (Canvas
+  API) und als Data-URL im selben Kontakt-Dokument gespeichert — kein separater
+  Speicherdienst nötig, keine zusätzlichen Firestore-Regeln erforderlich. Nur die
   Versicherungsdaten bleiben bewusst lokal im `localStorage` (sensibler, nicht
   gruppenrelevant) — siehe `js/notfall.js`
 - `css/style.css` — gemeinsames Design: hell/dunkel automatisch über
@@ -51,17 +54,16 @@ Einsatz — Setup siehe README.md, Config in `js/firebase-config.js`.
 `js/contacts.js`. Feature 2 (Live-Standort-Übersicht) — siehe `gruppe.html` +
 `js/livemap.js`, Ein/Aus-Schalter standardmässig aus, jederzeit widerrufbar (löscht den
 Firestore-Eintrag sofort), letzter bekannter Standort bleibt mit Zeitangabe sichtbar
-statt zu verschwinden (grau statt lila sobald über 2 Min alt).
+statt zu verschwinden (grau statt lila sobald über 2 Min alt). Feature 3 (Profilbilder)
+— siehe `notfall.html` + `js/contacts.js`, Bild wird im Browser auf 200×200px
+verkleinert und im selben Kontakt-Dokument gespeichert; erscheint als Avatar in der
+Gruppen-Kontaktliste (`notfall.html`) und auf der Live-Standortkarte (`gruppe.html`).
+
+Alle drei ursprünglich geplanten Features sind damit umgesetzt.
 
 Offen: die Firestore-Sicherheitsregeln in der Konsole müssen noch um die
 `locations`-Collection erweitert werden (Angel macht das selbst, Regeltext steht in
 README.md unter "Firebase einrichten").
-
-Noch offen:
-
-1. **Profilbilder**: einfachste kostenlose Umsetzung — Bild im Browser vor dem
-   Hochladen auf z. B. 200×200px verkleinern (Canvas API) und zusammen mit den
-   restlichen Daten in Firebase speichern. Kein separater Speicherdienst nötig.
 
 ## Vorgehen
 Bitte vor dem Loslegen kurz einen Plan vorschlagen (Datenstruktur in Firebase,

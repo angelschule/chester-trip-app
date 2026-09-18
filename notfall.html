@@ -44,6 +44,20 @@
           <input type="text" id="name" placeholder="Vor- und Nachname">
         </div>
 
+        <div class="card" style="display:flex;align-items:center;gap:14px;">
+          <div style="flex:none;position:relative;width:56px;height:56px;">
+            <img id="photo-preview" src="" alt="" style="width:56px;height:56px;border-radius:50%;object-fit:cover;display:none;">
+            <div id="photo-placeholder" style="width:56px;height:56px;border-radius:50%;background:var(--icon-tile-bg);display:flex;align-items:center;justify-content:center;color:var(--text-nav-inactive);">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.5"></circle><path d="M4.5 20c0-4.1 3.4-7.5 7.5-7.5s7.5 3.4 7.5 7.5"></path></svg>
+            </div>
+          </div>
+          <div style="flex:1 1 auto;">
+            <label for="photo-input" style="margin-bottom:2px;">Profilbild</label>
+            <input type="file" id="photo-input" accept="image/*" style="font-size:12.5px;">
+            <div class="secondary" style="font-size:11px;margin-top:6px;">Wird verkleinert und mit deiner Gruppe geteilt.</div>
+          </div>
+        </div>
+
         <div class="card" style="display:flex;align-items:center;gap:12px;">
           <div style="flex:1 1 auto;">
             <label for="gastfamilieName" style="margin-bottom:2px;">Gastfamilie – Name</label>

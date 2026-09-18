@@ -4,8 +4,14 @@
 // feste, geräteweite ID. Über diese ID kann sie NUR ihren eigenen Eintrag ändern —
 // siehe Firestore-Sicherheitsregeln in README.md. Versicherungsdaten sind hiervon
 // ausgenommen und bleiben lokal (siehe notfall.js).
+//
+// Profilbilder werden im Browser vor dem Hochladen auf PHOTO_SIZE×PHOTO_SIZE verkleinert
+// (Canvas API) und als Data-URL direkt im Kontakt-Dokument gespeichert — kein separater
+// Speicherdienst nötig, bleibt weit unter Firestores 1-MiB-Dokumentgrenze.
 
 const CONTACT_FIELDS = ["name", "gastfamilieName", "gastfamilieAdresse", "gastfamilieTelefon", "betreuungName", "betreuungTelefon"];
+const PHOTO_SIZE = 200;
+const PHOTO_QUALITY = 0.75;
 
 let contactsDb = null;
 let contactsUid = null;
@@ -69,6 +75,9 @@ async function initContactsForm() {
     el.addEventListener("change", () => saveContactField(docRef, field, el.value));
   });
 
+  showPhotoPreview(data.photo);
+  initPhotoUpload(docRef);
+
   updateNotfallLinks();
   setContactsStatus("Wird automatisch gespeichert und mit deiner Gruppe geteilt.");
   loadGroupContacts("group-contacts-list");
@@ -82,6 +91,66 @@ async function saveContactField(docRef, field, value) {
     setContactsStatus("Konnte nicht speichern — Internetverbindung prüfen.");
   }
   updateNotfallLinks();
+}
+
+function showPhotoPreview(dataUrl) {
+  const img = document.getElementById("photo-preview");
+  const placeholder = document.getElementById("photo-placeholder");
+  if (!img) return;
+  if (dataUrl) {
+    img.src = dataUrl;
+    img.style.display = "block";
+    if (placeholder) placeholder.style.display = "none";
+  } else {
+    img.style.display = "none";
+    if (placeholder) placeholder.style.display = "flex";
+  }
+}
+
+function resizeImageToSquareDataUrl(file, size, quality) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(reader.error);
+    reader.onload = () => {
+      const img = new Image();
+      img.onerror = reject;
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        canvas.width = size;
+        canvas.height = size;
+        const ctx = canvas.getContext("2d");
+        const side = Math.min(img.width, img.height);
+        const sx = (img.width - side) / 2;
+        const sy = (img.height - side) / 2;
+        ctx.drawImage(img, sx, sy, side, side, 0, 0, size, size);
+        resolve(canvas.toDataURL("image/jpeg", quality));
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function initPhotoUpload(docRef) {
+  const input = document.getElementById("photo-input");
+  if (!input) return;
+  input.addEventListener("change", async () => {
+    const file = input.files[0];
+    if (!file) return;
+    setContactsStatus("Bild wird verkleinert …");
+    try {
+      const dataUrl = await resizeImageToSquareDataUrl(file, PHOTO_SIZE, PHOTO_QUALITY);
+      showPhotoPreview(dataUrl);
+      await docRef.set({ photo: dataUrl, updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
+      setContactsStatus("Gespeichert · mit deiner Gruppe geteilt.");
+    } catch (e) {
+      setContactsStatus("Konnte Bild nicht verarbeiten — anderes Bild versuchen.");
+    }
+  });
+}
+
+function initialsFromName(name) {
+  return (name || "").split(/\s+/).filter(Boolean).slice(0, 2).map((p) => p[0].toUpperCase()).join("") || "?";
 }
 
 function loadGroupContacts(listId) {
@@ -128,9 +197,16 @@ function renderGroupContactCard(c) {
          ${c.betreuungTelefon ? ` · <a href="tel:${escapeHtml(c.betreuungTelefon.replace(/\s+/g, ""))}" style="color:var(--accent-blue);font-weight:600;">${escapeHtml(c.betreuungTelefon)}</a>` : ""}
        </div>`
     : "";
-  return `<div class="card">
-    <div style="font-weight:600;font-size:14px;margin-bottom:8px;">${escapeHtml(c.name)}</div>
-    ${gastLine}${betreuungLine}
+  const avatar = c.photo
+    ? `<img src="${c.photo}" alt="" style="flex:none;width:40px;height:40px;border-radius:50%;object-fit:cover;">`
+    : `<div style="flex:none;width:40px;height:40px;border-radius:50%;background:var(--accent-purple);color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;">${escapeHtml(initialsFromName(c.name))}</div>`;
+
+  return `<div class="card" style="display:flex;gap:12px;">
+    ${avatar}
+    <div style="flex:1 1 auto;">
+      <div style="font-weight:600;font-size:14px;margin-bottom:8px;">${escapeHtml(c.name)}</div>
+      ${gastLine}${betreuungLine}
+    </div>
   </div>`;
 }
 

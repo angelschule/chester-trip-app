@@ -23,7 +23,7 @@ let lastWriteTime = 0;
 let liveMap = null;
 let liveMarkers = {};
 let lastLocationEntries = [];
-const nameCache = {};
+const contactCache = {};
 
 function isSharingEnabled() {
   return localStorage.getItem(LOCATION_PREF_KEY) === "1";
@@ -174,17 +174,16 @@ function initLiveMapView() {
   }).addTo(liveMap);
 }
 
-function markerIcon(label, color) {
+function markerIcon(label, color, photo) {
+  const inner = photo
+    ? `<img src="${photo}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`
+    : escapeHtml(label);
   return L.divIcon({
     className: "",
-    html: `<div class="map-marker" style="background:${color};">${escapeHtml(label)}</div>`,
+    html: `<div class="map-marker" style="background:${photo ? "#FFFFFF" : color};${photo ? "overflow:hidden;padding:0;" : ""}">${inner}</div>`,
     iconSize: [32, 32],
     iconAnchor: [16, 16]
   });
-}
-
-function initialsFromName(name) {
-  return name.split(/\s+/).filter(Boolean).slice(0, 2).map((p) => p[0].toUpperCase()).join("") || "?";
 }
 
 function updateOwnMarker(pos) {
@@ -197,15 +196,16 @@ function updateOwnMarker(pos) {
   }
 }
 
-async function getCachedName(db, uid) {
-  if (nameCache[uid]) return nameCache[uid];
+async function getCachedContact(db, uid) {
+  if (contactCache[uid]) return contactCache[uid];
   try {
     const snap = await db.collection("contacts").doc(uid).get();
-    const name = snap.exists && snap.data().name ? snap.data().name : "Unbekannt";
-    nameCache[uid] = name;
-    return name;
+    const data = snap.exists ? snap.data() : {};
+    const contact = { name: data.name || "Unbekannt", photo: data.photo || null };
+    contactCache[uid] = contact;
+    return contact;
   } catch (e) {
-    return "Unbekannt";
+    return { name: "Unbekannt", photo: null };
   }
 }
 
@@ -236,7 +236,8 @@ function subscribeToGroupLocations() {
     const entries = await Promise.all(others.map(async (doc) => {
       const data = doc.data();
       const updatedAt = data.updatedAt && data.updatedAt.toMillis ? data.updatedAt.toMillis() : null;
-      return { id: doc.id, name: await getCachedName(db, doc.id), lat: data.lat, lon: data.lon, updatedAt };
+      const contact = await getCachedContact(db, doc.id);
+      return { id: doc.id, name: contact.name, photo: contact.photo, lat: data.lat, lon: data.lon, updatedAt };
     }));
 
     lastLocationEntries = entries;
@@ -253,7 +254,7 @@ function renderLiveMarkers(entries) {
   entries.forEach((e) => {
     seen.add(e.id);
     const color = isLiveEntry(e.updatedAt) ? "var(--accent-purple)" : "var(--accent-gray)";
-    const icon = markerIcon(initialsFromName(e.name), color);
+    const icon = markerIcon(initialsFromName(e.name), color, e.photo);
     const popup = `${escapeHtml(e.name)} · ${escapeHtml(formatRelativeTime(e.updatedAt))}`;
     if (liveMarkers[e.id]) {
       liveMarkers[e.id].setLatLng([e.lat, e.lon]);
@@ -281,8 +282,11 @@ function renderLiveLocationsList(listEl, entries) {
       const dist = myPos.isFallback ? "" : formatDistance(distanceMeters(myPos, e));
       const live = isLiveEntry(e.updatedAt);
       const timeLabel = `${live ? "Live" : "Zuletzt gesehen"} · ${escapeHtml(formatRelativeTime(e.updatedAt))}`;
+      const avatar = e.photo
+        ? `<img src="${e.photo}" alt="" style="flex:none;width:36px;height:36px;border-radius:50%;object-fit:cover;">`
+        : `<div style="flex:none;width:36px;height:36px;border-radius:50%;background:${live ? "var(--accent-purple)" : "var(--accent-gray)"};color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;">${escapeHtml(initialsFromName(e.name))}</div>`;
       return `<div class="card row-hover" style="display:flex;align-items:center;gap:12px;">
-        <div style="flex:none;width:36px;height:36px;border-radius:50%;background:${live ? "var(--accent-purple)" : "var(--accent-gray)"};color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;">${escapeHtml(initialsFromName(e.name))}</div>
+        ${avatar}
         <div style="flex:1 1 auto;">
           <div style="font-size:13.5px;font-weight:600;">${escapeHtml(e.name)}</div>
           <div class="secondary" style="font-size:11.5px;margin-top:1px;">${timeLabel}</div>
